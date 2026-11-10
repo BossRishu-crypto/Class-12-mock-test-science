@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSEB Class 12 - Pro Mock Test</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 0; color: #333; }
+        .container { max-width: 650px; margin: 30px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: #1a73e8; }
+        .btn { background: #1a73e8; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 6px; cursor: pointer; display: block; width: 100%; margin-top: 15px; font-weight: bold; }
+        .btn:hover { background: #1557b0; }
+        .google-btn { background: #db4437; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .google-btn:hover { background: #c33d2e; }
+        select { width: 100%; padding: 12px; margin: 10px 0 20px 0; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; }
+        .hidden { display: none !important; }
+        .timer { float: right; background: #ff4d4d; color: white; padding: 5px 10px; border-radius: 4px; font-size: 14px; }
+        .options label { display: block; background: #f8f9fa; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #ddd; cursor: pointer; transition: 0.2s; }
+        .options label:hover { background: #e8f0fe; border-color: #1a73e8; }
+        .options input { margin-right: 10px; }
+        #leaderboard-list { list-style: none; padding: 0; }
+        #leaderboard-list li { background: #f8f9fa; margin: 5px 0; padding: 10px; border-radius: 5px; display: flex; justify-content: space-between; border-left: 4px solid #1a73e8; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- स्टेप 1: लॉगिन स्क्रीन -->
+        <div id="login-screen">
+            <h1>Bihar Board Class 12</h1>
+            <p style="text-align: center; color: #666;">मॉक टेस्ट पोर्टल में आपका स्वागत है</p>
+            <button class="btn google-btn" onclick="loginWithGoogle()">
+                <span>Google (Gmail) से लॉगिन करें</span>
+            </button>
+        </div>
+
+        <!-- स्टेप 2: सब्जेक्ट और चैप्टर चयन -->
+        <div id="selection-screen" class="hidden">
+            <h2>विषय और अध्याय चुनें</h2>
+            <label>विषय चुनें (Subject):</label>
+            <select id="subject-select">
+                <option value="hindi">हिंदी (Hindi - बातचीत)</option>
+                <option value="physics">भौतिकी (Physics)</option>
+                <option value="chemistry">रसायन शास्त्र (Chemistry)</option>
+            </select>
+
+            <label>अध्याय चुनें (Chapter):</label>
+            <select id="chapter-select">
+                <option value="ch1">अध्याय 1 - महत्वपूर्ण वस्तुनिष्ठ प्रश्न</option>
+            </select>
+
+            <button class="btn" onclick="startQuiz()">टेस्ट शुरू करें</button>
+        </div>
+
+        <!-- स्टेप 3: क्विज़ स्क्रीन -->
+        <div id="quiz-screen" class="hidden">
+            <div>
+                <span id="question-counter" style="font-weight: bold;">प्रश्न 1/5</span>
+                <span id="time-left" class="timer">समय: 05:00</span>
+            </div>
+            <h3 id="question-text" style="margin-top: 25px;">यहाँ प्रश्न आएगा</h3>
+            <div class="options" id="options-container">
+                <!-- ऑप्शंस यहाँ आएंगे -->
+            </div>
+            <button class="btn" onclick="nextQuestion()">अगला प्रश्न</button>
+        </div>
+
+        <!-- स्टेप 4: रिजल्ट और लीडरबोर्ड -->
+        <div id="result-screen" class="hidden">
+            <h2>टेस्ट समाप्त!</h2>
+            <p id="score-display" style="text-align: center; font-size: 20px; font-weight: bold;"></p>
+            
+            <h3>टॉप 50 लीडरबोर्ड (Leaderboard)</h3>
+            <ul id="leaderboard-list">
+                <li><span>1. राहुल कुमार (रैंक #1)</span> <strong>95 मार्क्स</strong></li>
+                <li><span>2. प्रिया कुमारी (रैंक #2)</span> <strong>90 मार्क्स</strong></li>
+            </ul>
+            <button class="btn" onclick="location.reload()">दुबारा टेस्ट दें</button>
+        </div>
+    </div>
+
+    <script>
+        // डमी डेटा और लॉजिक ताकि बिना एरर के तुरंत टेस्ट चल सके
+        const allQuestions = [
+            { q: "'बातचीत' शीर्षक निबंध के निबंधकार कौन हैं?", options: ["बालकृष्ण भट्ट", "जयप्रकाश नारायण", "भगत सिंह", "नामवर सिंह"], ans: 0 },
+            { q: "बालकृष्ण भट्ट किस काल के रचनाकार हैं?", options: ["भारतेंदु युग", "आदिकाल", "भक्तिकाल", "छायावाद युग"], ans: 0 },
+            { q: "बुद्ध का अर्जुन किसे कहा गया है?", options: ["ओगड़", "लहना सिंह", "सुबेदार मेजर", "वज़ीर सिंह"], ans: 1 },
+            { q: "जयप्रकाश नारायण को किसका दलाल कहा गया?", options: ["अमेरिका", "ब्रिटेन", "रूस", "जापान"], ans: 0 },
+            { q: "अर्द्धनारीनरेश्वर किस विधा से संबंधित है?", options: ["निबंध", "कहानी", "एकंकी", "आत्मकथा"], ans: 0 }
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let timer;
+
+        function loginWithGoogle() {
+            // गूगल लॉगिन सिम्युलेशन (Firebase जोड़ने पर यह असली जीमेल ले लेगा)
+            alert("सफलतापूर्वक लॉगिन हो गया!");
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('selection-screen').classList.remove('hidden');
+        }
+
+        function startQuiz() {
+            document.getElementById('selection-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            
+            // सवालों को शफ्ल (आगे-पीछे) करना ताकि हर बार अलग क्रम में आएं
+            currentQuestions = [...allQuestions].sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            score = 0;
+            loadQuestion();
+            startTimer(300); // 5 मिनट का टाइमर
+        }
+
+        function loadQuestion() {
+            if (currentIndex >= currentQuestions.length) {
+                endQuiz();
+                return;
+            }
+            let qData = currentQuestions[currentIndex];
+            document.getElementById('question-counter').innerText = `प्रश्न ${currentIndex + 1} / ${currentQuestions.length}`;
+            document.getElementById('question-text').innerText = qData.q;
+            
+            let html = '';
+            qData.options.forEach((opt, index) => {
+                html += `<label><input type="radio" name="quiz-opt" value="${index}"> ${opt}</label>`;
+            });
+            document.getElementById('options-container').innerHTML = html;
+        }
+
+        function nextQuestion() {
+            let selected = document.querySelector('input[name="quiz-opt"]:checked');
+            if (selected) {
+                if (parseInt(selected.value) === currentQuestions[currentIndex].ans) {
+                    score += 1;
+                }
+            }
+            currentIndex++;
+            loadQuestion();
+        }
+
+        function startTimer(duration) {
+            let timerSec = duration;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                let m = Math.floor(timerSec / 60);
+                let s = timerSec % 60;
+                document.getElementById('time-left').innerText = `समय: ${m}:${s < 10 ? '0' : ''}${s}`;
+                if (--timerSec < 0) {
+                    clearInterval(timer);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        function endQuiz() {
+            clearInterval(timer);
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('score-display').innerText = `आपका कुल स्कोर: ${score} / ${currentQuestions.length}`;
+        }
+    </script>
+</body>
+</html>
